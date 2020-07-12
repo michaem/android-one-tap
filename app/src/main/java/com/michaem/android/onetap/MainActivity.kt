@@ -31,33 +31,50 @@ class MainActivity : AppCompatActivity() {
         oneTapClient = Identity.getSignInClient(this)
 
         findViewById<Button>(R.id.signInButton).setOnClickListener { signIn() }
-
-        findViewById<Button>(R.id.signOutButton).setOnClickListener { signOut() }
-
-        findViewById<Button>(R.id.signUpButton).setOnClickListener { signUp() }
     }
 
     private fun signIn() {
-        createSignInRequest(onlyAuthorizedAccounts = true).run { beginSignIn(this) }
+        val signInRequest = createSignInRequest(onlyAuthorizedAccounts = true)
+
+        oneTapClient
+            .beginSignIn(signInRequest)
+            .addOnSuccessListener(this) { result ->
+                try {
+                    startIntentSenderForResult(
+                        result.pendingIntent.intentSender, REQ_ONE_TAP,
+                        null, 0, 0, 0, null
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
+                }
+            }
+            .addOnFailureListener(this) { e ->
+                Log.d(TAG, e.localizedMessage)
+                // No saved credentials found. Launch the One Tap sign-up flow
+                signUp()
+            }
     }
 
     private fun signUp() {
-        createSignInRequest(onlyAuthorizedAccounts = false).run { beginSignIn(this) }
-    }
+        val signUpRequest = createSignInRequest(onlyAuthorizedAccounts = false)
 
-    private fun signOut() {
         oneTapClient
-            .signOut()
-            .addOnSuccessListener {
-                Log.d(TAG, "Success sign out")
-                Snackbar.make(parentView, "Sign out success", Snackbar.LENGTH_LONG).show()
+            .beginSignIn(signUpRequest)
+            .addOnSuccessListener(this) { result ->
+                try {
+                    startIntentSenderForResult(
+                        result.pendingIntent.intentSender, REQ_ONE_TAP,
+                        null, 0, 0, 0, null
+                    )
+                } catch (e: IntentSender.SendIntentException) {
+                    Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
+                }
             }
-            .addOnFailureListener { e ->
+            .addOnFailureListener(this) { e ->
                 Log.d(TAG, e.localizedMessage)
-                Snackbar.make(parentView, "Error: ${e.localizedMessage}", Snackbar.LENGTH_LONG)
-                    .show()
+                // No saved credentials found. Show error
+                Snackbar.make(parentView, e.localizedMessage, Snackbar.LENGTH_LONG).show()
             }
-
     }
 
     private fun createSignInRequest(onlyAuthorizedAccounts: Boolean): BeginSignInRequest =
@@ -77,28 +94,6 @@ class MainActivity : AppCompatActivity() {
                     .build()
             )
             .build()
-
-    private fun beginSignIn(signInRequest: BeginSignInRequest) {
-        oneTapClient
-            .beginSignIn(signInRequest)
-            .addOnSuccessListener(this) { result ->
-                try {
-                    startIntentSenderForResult(
-                        result.pendingIntent.intentSender, REQ_ONE_TAP,
-                        null, 0, 0, 0, null
-                    )
-                } catch (e: IntentSender.SendIntentException) {
-                    Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
-                }
-            }
-            .addOnFailureListener(this) { e ->
-                // No saved credentials found. Launch the One Tap sign-up flow, or
-                // do nothing and continue presenting the signed-out UI.
-                Log.d(TAG, e.localizedMessage)
-                Snackbar.make(parentView, "Error: ${e.localizedMessage}", Snackbar.LENGTH_LONG)
-                    .show()
-            }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -129,6 +124,13 @@ class MainActivity : AppCompatActivity() {
                             Log.d(TAG, "No ID token or password!")
                         }
                     }
+
+                    val intent = Intent(this, SecondActivity::class.java)
+                        .apply {
+                            putExtra(EXTRA_CREDENTIAL, credential)
+                        }
+                    startActivity(intent)
+
                 } catch (e: ApiException) {
                     when (e.statusCode) {
                         CommonStatusCodes.CANCELED -> {
@@ -154,7 +156,5 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         const val REQ_ONE_TAP = 12345
-        const val TAG = "AndroidOneTap"
-
     }
 }

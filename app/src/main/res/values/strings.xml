@@ -1,5 +1,7 @@
 <resources>
-	<string name="app_name">android-one-tap</string>
+	<string name="app_name">One Tap Sign-in Sample</string>
 
 	<string name="your_web_client_id">240953991415-ccbvqn47l5bo53psom4ranffebr7frt5.apps.googleusercontent.com</string>
+    <string name="user">%1$s\n%2$s</string>
+    <string name="signIn">Sign In</string>
 </resources>
