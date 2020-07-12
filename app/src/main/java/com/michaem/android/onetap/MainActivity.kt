@@ -21,29 +21,14 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	private lateinit var oneTapClient: SignInClient
-	private lateinit var signInRequest: BeginSignInRequest
 
 	private var showOneTapUI = true
-	private var onlyAuthorizedAccounts = true
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 
 		oneTapClient = Identity.getSignInClient(this)
-		signInRequest = BeginSignInRequest.builder()
-			.setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
-				.setSupported(true)
-				.build())
-			.setGoogleIdTokenRequestOptions(
-				BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-					.setSupported(true)
-					// Your server's client ID, not your Android client ID.
-					.setServerClientId(getString(R.string.your_web_client_id))
-					// Only show accounts previously used to sign in.
-					.setFilterByAuthorizedAccounts(onlyAuthorizedAccounts)
-					.build())
-			.build()
 
 		findViewById<Button>(R.id.signInButton).setOnClickListener { signIn() }
 
@@ -52,9 +37,12 @@ class MainActivity : AppCompatActivity() {
 		findViewById<Button>(R.id.signUpButton).setOnClickListener { signUp() }
 	}
 
+    private fun signIn() {
+        createSignInRequest(onlyAuthorizedAccounts = true).run { beginSignIn(this) }
+    }
+
 	private fun signUp() {
-		onlyAuthorizedAccounts = false
-		beginSignIn()
+        createSignInRequest(onlyAuthorizedAccounts = false).run { beginSignIn(this) }
 	}
 
 	private fun signOut() {
@@ -71,12 +59,22 @@ class MainActivity : AppCompatActivity() {
 
 	}
 
-	private fun signIn() {
-		onlyAuthorizedAccounts = true
-		beginSignIn()
-	}
+	private fun createSignInRequest(onlyAuthorizedAccounts: Boolean): BeginSignInRequest =
+		BeginSignInRequest.builder()
+			.setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
+				.setSupported(true)
+				.build())
+			.setGoogleIdTokenRequestOptions(
+				BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+					.setSupported(true)
+					// Your server's client ID, not your Android client ID.
+					.setServerClientId(getString(R.string.your_web_client_id))
+					// Only show accounts previously used to sign in.
+					.setFilterByAuthorizedAccounts(onlyAuthorizedAccounts)
+					.build())
+			.build()
 
-	private fun beginSignIn() {
+	private fun beginSignIn(signInRequest: BeginSignInRequest) {
 		oneTapClient
 			.beginSignIn(signInRequest)
 			.addOnSuccessListener(this) { result ->
