@@ -2,8 +2,8 @@
 	<!-- Base application theme. -->
 	<style name="Theme.AndroidOneTap" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 		<!-- Primary brand color. -->
-		<item name="colorPrimary">@color/purple_500</item>
-		<item name="colorPrimaryVariant">@color/purple_700</item>
+		<item name="colorPrimary">@color/pink_400</item>
+		<item name="colorPrimaryVariant">@color/pink_600</item>
 		<item name="colorOnPrimary">@color/white</item>
 		<!-- Secondary brand color. -->
 		<item name="colorSecondary">@color/teal_200</item>
@@ -20,6 +20,11 @@
 		<item name="android:theme">?attr/actionBarTheme</item>
 
 		<item name="titleTextColor">?attr/colorOnPrimary</item>
+	</style>
+
+	<style name="Toolbar.Transparency" parent="Toolbar">
+		<item name="android:background">@android:color/transparent</item>
+		<item name="titleTextColor">?attr/colorOnSecondary</item>
 	</style>
 
 </resources>

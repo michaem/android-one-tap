@@ -13,7 +13,7 @@
 		app:title="@string/app_name"
 		app:navigationIcon="@drawable/ic_android"
 		app:layout_constraintTop_toTopOf="parent"
-		style="@style/Toolbar"/>
+		style="@style/Toolbar.Transparency"/>
 
 	<Button
 		android:id="@+id/signInButton"

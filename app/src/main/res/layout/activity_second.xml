@@ -8,12 +8,11 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_login"
-        app:title="@string/app_name" />
+        style="@style/Toolbar.Transparency"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
