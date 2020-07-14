@@ -19,6 +19,8 @@
 		android:id="@+id/signInButton"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:drawableLeft="@drawable/common_google_signin_btn_icon_dark"
+		android:drawablePadding="10dp"
 		android:text="@string/signIn"
 		app:layout_constraintTop_toTopOf="parent"
 		app:layout_constraintBottom_toBottomOf="parent"
